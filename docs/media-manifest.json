@@ -1,0 +1,26 @@
+{
+  "source_html_sha256": "b78a6bfd3ab2410b12bad977d39975a9123a00c5e36ed418aff67319b370a03a",
+  "capture": "Actual browser interactions with the validated recorded local demo. No new ledger actions occur in the browser.",
+  "width": 1440,
+  "height": 900,
+  "duration_seconds": 21.72,
+  "frames": 543,
+  "fps": 25,
+  "assets": [
+    {
+      "path": "docs/showcase.mp4",
+      "bytes": 2576147,
+      "sha256": "8db616b17da8f58f5b20a6944482b2efca83badc4c8c5621c975a10cccba0d22"
+    },
+    {
+      "path": "docs/showcase.gif",
+      "bytes": 4944011,
+      "sha256": "a0742290819a23c536c390fa6e72d2fecd4612a4392cff8051c7ddf8c921586a"
+    },
+    {
+      "path": "docs/showcase-poster.png",
+      "bytes": 1046911,
+      "sha256": "869e219ebe196632f84e8dba9acd1cd1e6bae547f5989c0a1a9567c75e782474"
+    }
+  ]
+}

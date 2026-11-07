@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ledger | Recorded actions, inspectable state</title>
+<meta name="description" content="Inspect a real local SQLite audit ledger, independent checkpoint comparisons and rebuilt projections. Consistency is not authenticity.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23dceeff'/%3E%3Cpath d='M14 12h36v40H14zM23 23h19M23 32h19M23 41h14' fill='none' stroke='black' stroke-width='4'/%3E%3C/svg%3E">
+<style>/*__STYLE__*/</style>
+</head>
+<body>
+<a class="skip" href="#events">Skip to recorded evidence</a>
+<svg class="symbols" aria-hidden="true"><defs>
+<symbol id="mark-book" viewBox="0 0 64 64"><path d="M14 12h36v40H14zM23 23h19M23 32h19M23 41h14" fill="none" stroke="currentColor" stroke-width="4" stroke-linejoin="round"/></symbol>
+<symbol id="art-stapler" viewBox="0 0 160 180"><g stroke="#000" stroke-width="3" stroke-linejoin="round"><path d="M36 87l90-14 20 47-103 23-20-25z" fill="#fb4903"/><path d="M47 29l61 7 13 89-65 7z" fill="#fff"/><path d="M57 46l39 4M59 61l39 4M62 76l27 3" fill="none"/><path d="M22 24l91-7 17 26-98 16z" fill="#fb4903"/><path d="M30 58l99-15-2 27-89 12z" fill="#ff9c76"/><path d="M32 134l111-16-5 24-102 20z" fill="#fb4903"/></g></symbol>
+<symbol id="art-anchor" viewBox="0 0 160 160"><g stroke="#000" stroke-width="3"><path d="M35 34c28-24 73-14 85 15l10 49c-8 25-42 44-71 31L29 94z" fill="#ffd731"/><path d="M31 62c26-25 66-29 94 0" fill="none"/><path d="M54 69h49v35H54z" fill="#fff"/><path d="M62 68V56c0-26 33-27 33-5" fill="none" stroke-width="9"/><path d="M58 115l45-7" fill="none"/></g></symbol>
+<symbol id="art-reel" viewBox="0 0 160 160"><g stroke="#000" stroke-width="3"><ellipse cx="82" cy="89" rx="65" ry="59" fill="#55db9c"/><ellipse cx="76" cy="75" rx="63" ry="57" fill="#81edb7"/><ellipse cx="76" cy="75" rx="52" ry="46" fill="#55db9c"/><circle cx="76" cy="75" r="10" fill="#000"/><path d="M64 41h25l-8 19H61zM103 77l-1 23-20-7 3-18zM58 108l-20-15 17-13 18 10z" fill="#000"/><path d="M125 17l5 15 15 4-15 6-5 14-5-15-14-5 15-5z" fill="#fff"/></g></symbol>
+<symbol id="art-binder" viewBox="0 0 170 160"><g stroke="#000" stroke-width="3" stroke-linejoin="round"><path d="M30 45l80-27 34 19-75 37z" fill="#fff"/><path d="M36 39l77-21 23 14-76 30z" fill="#55db9c"/><path d="M17 59l104-30 31 70-108 39-27-26z" fill="#5b43dc"/><path d="M44 138l109-39-5 17-95 32z" fill="#000"/><path d="M100 38l16 30 18-5-14-32M28 74l14 40" fill="none"/><path d="M54 76l38-12 6 19-38 12z" fill="#e9ccff"/></g></symbol>
+</defs></svg>
+<div class="notice"><span class="sr-only">Local SQLite demo. Recorded observations. Unsigned checkpoints.</span><div id="notice-track" aria-hidden="true"><span>Local SQLite demo &nbsp; / &nbsp; Recorded observations &nbsp; / &nbsp; Unsigned checkpoints &nbsp; / &nbsp;</span><span>Local SQLite demo &nbsp; / &nbsp; Recorded observations &nbsp; / &nbsp; Unsigned checkpoints &nbsp; / &nbsp;</span><span>Local SQLite demo &nbsp; / &nbsp; Recorded observations &nbsp; / &nbsp; Unsigned checkpoints &nbsp; / &nbsp;</span></div></div>
+<header class="header"><a class="brand" href="#overview" aria-label="Ledger home"><svg aria-hidden="true"><use href="#mark-book"/></svg></a><nav id="primary-nav" aria-label="Main navigation"><a href="#overview">Overview</a><a href="#events">Events</a><a href="#verify">Verify</a><a href="#replay">Replay</a><a href="#limits">Limits</a><button id="nav-export">Export</button></nav><button id="menu-toggle" aria-expanded="true" aria-controls="primary-nav" aria-label="Collapse navigation"><span aria-hidden="true">+</span></button><a class="header-cta" href="#screens">Inspect demo</a></header>
+<button id="motion-toggle" aria-pressed="false">Pause motion</button>
+<main>
+<section id="overview" class="blue-shell">
+<canvas id="link-canvas" aria-hidden="true"></canvas><svg id="art-fallback" aria-hidden="true" hidden viewBox="0 0 1440 1500" preserveAspectRatio="xMidYMin slice"><defs><linearGradient id="fallback-blue" x2="0" y2="1"><stop stop-color="#98e4ff"/><stop offset=".35" stop-color="#0877db"/><stop offset=".6" stop-color="#004f98"/><stop offset="1" stop-color="#59caff"/></linearGradient></defs><g fill="none" stroke="url(#fallback-blue)" stroke-width="170"><rect x="60" y="-60" width="1150" height="400" rx="200" transform="rotate(-30 650 200)"/><rect x="200" y="720" width="1200" height="400" rx="200" transform="rotate(-35 800 920)"/></g></svg>
+<p id="fallback-notice" hidden>Static artwork. All recorded evidence remains available.</p>
+<div class="hero-copy"><h1 class="sr-only">Ledger. Records. Rebuilt.</h1><svg id="hero-word" aria-hidden="true" viewBox="0 0 1800 500" preserveAspectRatio="none"><text id="hero-glyphs" x="0" y="430">LEDGER</text></svg><p class="hero-subtitle">Records. Rebuilt.</p><div class="hero-actions"><a class="pill" href="#screens">Inspect demo</a><button class="pill" id="hero-export">Export evidence</button></div></div>
+<svg class="sticker stapler" aria-hidden="true"><use href="#art-stapler"/></svg><svg class="sticker anchor" aria-hidden="true"><use href="#art-anchor"/></svg><svg class="sticker reel" aria-hidden="true"><use href="#art-reel"/></svg><svg class="sticker binder" aria-hidden="true"><use href="#art-binder"/></svg>
+<div id="screens" class="screens" tabindex="-1"><div id="screen-pair" class="screen-pair"><section class="phone phone-events"><div class="phone-camera" aria-hidden="true"></div><h2>Recorded<br>events.</h2><p id="phone-ledger"></p><ol id="phone-events"></ol><button id="phone-inspect">Inspect records</button></section><section class="phone phone-state"><div class="phone-camera" aria-hidden="true"></div><h2>Rebuilt<br>state.</h2><p id="phone-chain"></p><dl id="phone-counts"></dl><a href="#replay">Inspect projection</a></section></div><p class="screen-caption">Two views of the recorded local demo. No agent actions are replayed in your browser.</p></div>
+<div class="collage" aria-label="Every record in context"><span>EVERY</span><span>RECORD</span><span>IN CONTEXT</span><svg aria-hidden="true"><use href="#art-anchor"/></svg><button id="collage-export">Export<br>JSON ↗</button><p>Consistency is not authenticity.<br>An independent checkpoint protects a prefix.</p></div>
+</section>
+<section class="white-shell"><h2 class="intro-title">A history you can inspect.</h2>
+<article id="verify" class="feature"><div class="feature-art lilac" aria-hidden="true"><svg><use href="#art-binder"/></svg></div><div class="feature-copy"><h2>VERIFY<br>THE CHAIN.</h2><p>Read the recorded verification. A consistent chain without an anchor is not proof of complete history.</p><div id="verify-result" class="result-summary"></div><a class="pill small" href="#anchor">Compare altered copies</a></div></article>
+<article id="replay" class="feature reverse"><div class="feature-art green" aria-hidden="true"><svg><use href="#art-reel"/></svg></div><div class="feature-copy"><h2>REBUILD<br>THE STATE.</h2><p>The core created new SQLite projections and reopened them. Choose the prefix or full recorded result.</p><label>Recorded projection<select id="projection-select" disabled><option value="prefix">Prefix</option><option value="full" selected>Full</option></select></label><div id="projection-result" class="result-summary"></div><button id="projection-details" class="pill small">Read SQL rows</button></div></article>
+</section>
+<section id="events" class="evidence-section" tabindex="-1">
+    <div class="section-title"><h2>Every record.<br>Unchanged.</h2><p id="source-mode"></p></div>
+    <details><summary>Original ledger header and provenance</summary><pre id="ledger-header"></pre></details>
+    <div class="event-workbench">
+        <div class="event-navigation">
+            <label>Recorded event<select id="event-select" disabled></select></label>
+            <div class="row-actions"><button id="previous-event">Previous</button><button id="next-event">Next</button></div>
+            <ol id="event-list"></ol>
+        </div>
+        <div id="event-detail">
+            <h3 id="event-title"></h3><dl id="event-facts"></dl>
+            <h4>Payload</h4><pre id="event-payload"></pre>
+            <details><summary>Complete original record</summary><pre id="event-json"></pre></details>
+        </div>
+    </div>
+</section>
+<section id="anchor" class="anchor-section"><h2>What does<br>an anchor see?</h2><p>Three separately altered copies. Compare the same copy with and without the independently retained demo checkpoint.</p><div class="selectors"><label>Recorded alteration<select id="tamper-select" disabled></select></label><label>Anchor perspective<select id="anchor-perspective" disabled><option value="with_anchor">With retained checkpoint</option><option value="without_anchor">Without checkpoint</option></select></label></div><div id="tamper-result" class="result-summary"></div><details><summary>Complete verification result</summary><pre id="tamper-json"></pre></details><details><summary>Original checkpoint</summary><pre id="checkpoint-json"></pre></details><p class="limit">The demo retains the expected digest outside each altered copy. This simulates an independent anchor boundary; it is not an independent witness against control of the same host.</p></section>
+<section id="files" class="files-section"><h2>Bytes, actually read.</h2><p>The core read both original files and compared their measured hashes with the recorded declarations.</p><div id="artifact-checks"></div></section>
+<section id="limits" class="limits-section"><h2>Know the limit.</h2><p>Unsigned records describe actions. Hashes check consistency, not truth or identity. An anchor protects its prefix, not an unseen later tail. Rebuilding state does not recreate artifact files or repeat agent actions.</p><p>Recorded local demo. This offline viewer does not append to SQLite, run verification, or establish a new checkpoint.</p><details><summary>Original source and runtime bindings</summary><pre id="manifest-json"></pre></details><details><summary>Architecture</summary><!--__DIAGRAM__--></details><details><summary>Visual reference and licenses</summary><p>Composition studied from <a href="https://slush.app/">Slush</a>. The illustrated links, stickers, ledger screens and interactions are original. Anton and system Arial replace licensed reference typefaces. Motion timings and functional menu collapse are authored adaptations. Full visual equivalence is not established.</p><button id="license-export">Export font license</button></details><button id="export-button" class="pill">Export original evidence</button></section>
+</main>
+<footer>Made by WW</footer>
+<dialog id="export-dialog" aria-labelledby="export-title"><div class="dialog-header"><h2 id="export-title">Original evidence.</h2><button id="export-close">Close</button></div><label>Artifact<select id="export-kind"></select></label><button id="export-artifact" class="pill">Download original JSON</button><p id="export-status" role="status"></p><p>Exact serializer bytes, without a browser reconstruction.</p></dialog>
+<dialog id="projection-dialog" aria-labelledby="projection-title"><div class="dialog-header"><h2 id="projection-title">Reopened SQL projection.</h2><button id="projection-close">Close</button></div><p id="projection-provenance"></p><div id="projection-rows"></div><details><summary>Full recorded projection and receipt</summary><pre id="projection-json"></pre></details></dialog>
+<p id="init-status" role="status">Loading recorded evidence.</p>
+<noscript><p class="noscript">Use the Python CLI to inspect original artifacts. This interactive viewer requires JavaScript.</p></noscript>
+<script id="showcase-data" type="application/json">__DATA__</script><script id="showcase-artifacts" type="application/json">__ARTIFACTS__</script><script id="font-license" type="application/json">__FONT_LICENSE__</script><script id="build-info" type="application/json">__BUILD_INFO__</script><script>/*__SCRIPT__*/</script>
+</body>
+</html>
