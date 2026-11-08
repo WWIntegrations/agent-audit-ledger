@@ -21,7 +21,9 @@ RECORDED_FILES = ('ledger.sqlite', 'checkpoint.json', 'export.json',
 def source_files():
     package = Path(__file__).resolve().parent
     root = package.parent
-    paths = sorted([*package.glob('*.py'), root / 'pyproject.toml'], key=lambda p: p.relative_to(root).as_posix())
+    # An installed package has no pyproject.toml beside it; a source checkout does.
+    extra = [root / 'pyproject.toml'] if (root / 'pyproject.toml').is_file() else []
+    paths = sorted([*package.glob('*.py'), *extra], key=lambda p: p.relative_to(root).as_posix())
     return [{'path': p.relative_to(root).as_posix(),
              'sha256': hashlib.sha256(read_bytes(p, 256*1024)).hexdigest()} for p in paths]
 

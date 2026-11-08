@@ -1,12 +1,15 @@
-"""JSON-only command results, bounded diagnostics, no network operations."""
+"""Human summary by default, `--json` for machines; bounded diagnostics, no network operations."""
 import argparse
+from pathlib import Path
 import sqlite3
 import sys
+import tempfile
 
 from . import core, formats as f
 from .demo import make_demo
 from .files import read_json
 from .projection import replay
+from .summary import clean, error_line, render
 
 
 class Parser(argparse.ArgumentParser):
@@ -19,8 +22,9 @@ def parser():
     sub = p.add_subparsers(dest='command', required=True)
     for name in ('init', 'append', 'verify', 'checkpoint', 'export', 'import', 'replay', 'demo'):
         cmd = sub.add_parser(name)
+        cmd.add_argument('--json', action='store_true', help='print the full machine-readable JSON result')
         if name == 'demo':
-            cmd.add_argument('--out-dir', required=True)
+            cmd.add_argument('--out-dir', help='new directory for the demo files (default: a fresh temporary one)')
             continue
         cmd.add_argument('--db', required=True)
         if name == 'append':
@@ -41,8 +45,10 @@ def parser():
 def main(argv=None):
     try:
         a = parser().parse_args(argv)
-        print(f.canonical({'format': 'audit-runtime-v1', 'python': sys.version.split()[0],
-                           'sqlite': sqlite3.sqlite_version}).decode(), file=sys.stderr)
+        as_json = a.json
+        if as_json:
+            print(f.canonical({'format': 'audit-runtime-v1', 'python': sys.version.split()[0],
+                               'sqlite': sqlite3.sqlite_version}).decode(), file=sys.stderr)
         anchor = core.load_anchor(getattr(a, 'checkpoint', None), getattr(a, 'expected_checkpoint_digest', None))
         if a.command == 'init':
             result = core.init(a.db)
@@ -64,15 +70,27 @@ def main(argv=None):
                 t = f.integer(int(a.through_seq), upper=1000)
             result = replay(a.db, a.out_db, t, anchor)
         else:
-            result = make_demo(a.out_dir)
-        sys.stdout.buffer.write(f.bounded(result, f.MAX_JSON-1) + b'\n')
-        sys.stdout.buffer.flush()
+            out_dir = a.out_dir or str(Path(tempfile.mkdtemp(prefix='audit-ledger-demo-')) / 'run')
+            result = make_demo(out_dir)
+            if not as_json:
+                print('Demo files: %s' % clean(out_dir))
+        if as_json:
+            sys.stdout.buffer.write(f.bounded(result, f.MAX_JSON-1) + b'\n')
+        else:
+            print('\n'.join(render(result)))
+        sys.stdout.flush()
         return 1 if result.get('format') == 'audit-verify-v1' and result['failure'] is not None else 0
     except f.AuditError as exc:
-        print(f.canonical({'format': 'audit-error-v1', 'code': exc.code}).decode(), file=sys.stderr)
+        if '--json' in (argv if argv is not None else sys.argv[1:]):
+            print(f.canonical({'format': 'audit-error-v1', 'code': exc.code}).decode(), file=sys.stderr)
+        else:
+            print(error_line(exc.code), file=sys.stderr)
         return exc.exit_code
     except OSError:
-        print('{"code":"io_error","format":"audit-error-v1"}', file=sys.stderr)
+        if '--json' in (argv if argv is not None else sys.argv[1:]):
+            print('{"code":"io_error","format":"audit-error-v1"}', file=sys.stderr)
+        else:
+            print('error: io_error - a file operation failed', file=sys.stderr)
         return 2
 
 

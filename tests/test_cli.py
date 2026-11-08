@@ -19,10 +19,14 @@ class LedgerCLI(unittest.TestCase):
         self.base = Path(self.temp.name)
         self.db = self.base / 'ledger.sqlite'
 
-    def call(self, *args, code=0):
+    def raw(self, *args, code=0):
         p = subprocess.run([sys.executable, '-m', 'ledger_audit', *map(str, args)],
-                           cwd=ROOT, capture_output=True, text=True, timeout=15)
+                           cwd=ROOT, capture_output=True, text=True, timeout=30)
         self.assertEqual(p.returncode, code, p.stderr + p.stdout)
+        return p
+
+    def call(self, *args, code=0):
+        p = self.raw(*args, '--json', code=code)
         return json.loads(p.stdout) if p.stdout else json.loads(p.stderr.splitlines()[-1])
 
     def event(self, event_id, kind, payload):
@@ -107,6 +111,67 @@ class LedgerCLI(unittest.TestCase):
         self.assertEqual(checks['tail_truncated']['without_anchor']['chain'], 'consistent')
         self.assertEqual(checks['tail_truncated']['with_anchor']['failure']['code'], 'truncated_before_anchor')
         self.assertEqual(result['replay_full']['counts']['artifact_bytes'], sum(x['measured_bytes'] for x in result['artifact_checks']))
+
+    def test_default_output_is_a_short_human_summary(self):
+        p = self.raw('demo', '--out-dir', self.base / 'human')
+        self.assertLess(len(p.stdout), 1500)
+        self.assertEqual(len(p.stdout.splitlines()), 7, p.stdout)
+        self.assertIn('Verdict: PASS', p.stdout)
+        self.assertNotIn('{', p.stdout)
+        self.assertEqual(p.stderr, '')
+
+    def test_demo_can_run_twice_without_out_dir(self):
+        import os
+        env_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(env_tmp.cleanup)
+        outs = []
+        for _ in range(2):
+            p = subprocess.run([sys.executable, '-m', 'ledger_audit', 'demo'], cwd=ROOT, capture_output=True,
+                               text=True, timeout=30, env={**os.environ, 'TMPDIR': env_tmp.name})
+            self.assertEqual(p.returncode, 0, p.stderr)
+            self.assertIn('Verdict: PASS', p.stdout)
+            outs.append(p.stdout.splitlines()[0])
+        self.assertNotEqual(outs[0], outs[1])
+
+    def test_demo_works_from_an_installed_copy_without_pyproject(self):
+        import shutil
+        site = self.base / 'site'
+        shutil.copytree(ROOT / 'ledger_audit', site / 'ledger_audit', ignore=shutil.ignore_patterns('__pycache__'))
+        p = subprocess.run([sys.executable, '-B', '-m', 'ledger_audit', 'demo', '--out-dir', str(self.base / 'inst')],
+                           cwd=site, capture_output=True, text=True, timeout=30)
+        self.assertEqual(p.returncode, 0, p.stderr)
+        self.assertIn('Verdict: PASS', p.stdout)
+
+    def test_human_output_escapes_terminal_control_and_bidi(self):
+        evil = '\x1b]8;;http://evil\x1b\\X\u202e\r'
+        from ledger_audit.summary import render
+        out = '\n'.join(render({'format': 'audit-append-v1', 'disposition': 'appended',
+                                'record': {'event_id': evil, 'seq': 1, 'type': 'run_started'}}))
+        self.assertNotIn('\x1b', out)
+        self.assertNotIn('\u202e', out)
+        self.assertNotIn('\r', out)
+        self.assertIn('\\x1b', out)
+        self.assertIn('\\u202e', out)
+        weird = self.base / ('d\u202e\x1b')
+        r = self.raw('demo', '--out-dir', weird)
+        self.assertNotIn('\x1b', r.stdout)
+        self.assertNotIn('\u202e', r.stdout)
+
+    def test_human_verify_and_error_hint_for_existing_target(self):
+        self.start()
+        self.finish()
+        out = self.raw('verify', '--db', self.db).stdout
+        self.assertIn('OK    chain consistent, 2 event(s)', out)
+        self.assertIn('no checkpoint given', out)
+        err = self.raw('init', '--db', self.db, code=2).stderr
+        self.assertIn('output_exists', err)
+        self.assertIn('Choose a new path', err)
+
+    def test_examples_directory_commands_work_as_documented(self):
+        self.raw('init', '--db', self.db)
+        self.raw('append', '--db', self.db, '--event', ROOT / 'examples' / 'start.json')
+        self.raw('append', '--db', self.db, '--event', ROOT / 'examples' / 'finish.json')
+        self.assertIn('2 event(s)', self.raw('verify', '--db', self.db).stdout)
 
 
 if __name__ == '__main__':
