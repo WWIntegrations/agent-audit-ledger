@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 992 248" width="992" height="248" role="img" aria-labelledby="t d">
+<title id="t">ledger-audit verify: chain first, then anchor</title><desc id="d">The ledger file is opened with size and journal checks; the schema, every record, the sequence, the hash links and the head are validated. An optional checkpoint is compared with the pinned digest and the chain; the result reports the anchor as exact, prefix, none or failed.</desc>
+<style>:root{--tlo:#050507;--tekst:#FDFFF5;--linia:#A8A8B0;--strefa:#A8A8B0;--wezel:#14141C;--wezel-tekst:#FDFFF5;--akcent:#8C8CF0;}text{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;fill:var(--tekst)}.n{font-size:13px;font-weight:600;fill:var(--wezel-tekst)}.p{font-size:11px;fill:var(--wezel-tekst)}.s{font-size:12px;fill:var(--strefa)}.tt{font-size:16px;font-weight:700}.wz{fill:var(--wezel);stroke:var(--linia);stroke-width:1.5}.bram{stroke:var(--akcent);stroke-width:3}.mod{stroke-dasharray:0}.st{fill:none;stroke:var(--strefa);stroke-width:1.5;stroke-dasharray:6 4}.kr{stroke:var(--linia);stroke-width:1.5;fill:none}.gr{stroke:var(--akcent);stroke-width:2.5}.gt{fill:var(--akcent)}</style>
+<rect width="992" height="248" fill="#050507"/>
+<text class="tt" x="40" y="32">ledger-audit verify: chain first, then anchor</text>
+<g><rect class="st" x="16" y="72" width="216" height="160" rx="6"/><text class="s" x="26" y="88">Ledger file, may be edited</text></g>
+<g><rect class="st" x="264" y="72" width="712" height="160" rx="6"/><text class="s" x="274" y="88">Verifier process</text></g>
+<path class="kr" d="M208 152H280"/><path class="gt" d="M288 152l-9 -5v10z"/>
+<path class="gr" d="M248 102V202"/>
+<path class="kr" d="M456 152H528"/><path class="gt" d="M536 152l-9 -5v10z"/>
+<path class="kr" d="M704 152H776"/><path class="gt" d="M784 152l-9 -5v10z"/>
+<g data-id="db" data-typ="klient"><rect class="wz" x="40" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="124" y="144" text-anchor="middle">Ledger SQLite file</text>
+<text class="p" x="124" y="178" text-anchor="middle">regular file, 32 MiB max</text></g>
+<g data-id="scan" data-typ="bramka"><rect class="wz bram" x="288" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="372" y="138" text-anchor="middle">Schema and chain</text>
+<text class="n" x="372" y="154" text-anchor="middle">scan</text>
+<text class="p" x="372" y="178" text-anchor="middle">hashes, sequence, head</text></g>
+<g data-id="anchor" data-typ="bramka"><rect class="wz bram" x="536" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="620" y="144" text-anchor="middle">Checkpoint anchor</text>
+<text class="p" x="620" y="178" text-anchor="middle">file plus pinned digest</text></g>
+<g data-id="result" data-typ="usluga"><rect class="wz" x="784" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="868" y="144" text-anchor="middle">Verify result</text>
+<text class="p" x="868" y="178" text-anchor="middle">exact, prefix, none, failed</text></g>
+</svg>
