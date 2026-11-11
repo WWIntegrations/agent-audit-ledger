@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 992 248" width="992" height="248" role="img" aria-labelledby="t d">
+<title id="t">How agent-audit-ledger works</title><desc id="d">Agent events are appended to a hash-chained SQLite ledger. Verification checks the chain for internal consistency and compares it with a checkpoint digest that an independent observer retained. The result says whether the history is intact or which kind of tampering was found.</desc>
+<style>:root{--tlo:#FDFFF5;--tekst:#050507;--linia:#55555A;--strefa:#55555A;--wezel:#FFFFFF;--wezel-tekst:#050507;--akcent:#322DB8;}text{font-family:system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;fill:var(--tekst)}.n{font-size:13px;font-weight:600;fill:var(--wezel-tekst)}.p{font-size:11px;fill:var(--wezel-tekst)}.s{font-size:12px;fill:var(--strefa)}.tt{font-size:16px;font-weight:700}.wz{fill:var(--wezel);stroke:var(--linia);stroke-width:1.5}.bram{stroke:var(--akcent);stroke-width:3}.mod{stroke-dasharray:0}.st{fill:none;stroke:var(--strefa);stroke-width:1.5;stroke-dasharray:6 4}.kr{stroke:var(--linia);stroke-width:1.5;fill:none}.gr{stroke:var(--akcent);stroke-width:2.5}.gt{fill:var(--akcent)}</style>
+<rect width="992" height="248" fill="#FDFFF5"/>
+<text class="tt" x="40" y="32">How agent-audit-ledger works</text>
+<g><rect class="st" x="16" y="72" width="216" height="160" rx="6"/><text class="s" x="26" y="88">Agent run</text></g>
+<g><rect class="st" x="264" y="72" width="216" height="160" rx="6"/><text class="s" x="274" y="88">Local ledger</text></g>
+<g><rect class="st" x="512" y="72" width="464" height="160" rx="6"/><text class="s" x="522" y="88">Independent observer</text></g>
+<path class="kr" d="M208 152H280"/><path class="gt" d="M288 152l-9 -5v10z"/>
+<path class="gr" d="M248 102V202"/>
+<path class="kr" d="M456 152H528"/><path class="gt" d="M536 152l-9 -5v10z"/>
+<path class="gr" d="M496 102V202"/>
+<path class="kr" d="M704 152H776"/><path class="gt" d="M784 152l-9 -5v10z"/>
+<g data-id="events" data-typ="klient"><rect class="wz" x="40" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="124" y="144" text-anchor="middle">Agent events</text>
+<text class="p" x="124" y="178" text-anchor="middle">JSON, one per step</text></g>
+<g data-id="ledger" data-typ="usluga"><rect class="wz" x="288" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="372" y="144" text-anchor="middle">Hash-chain ledger</text>
+<text class="p" x="372" y="178" text-anchor="middle">SQLite, append only</text></g>
+<g data-id="verify" data-typ="bramka"><rect class="wz bram" x="536" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="620" y="144" text-anchor="middle">Verify</text>
+<text class="p" x="620" y="178" text-anchor="middle">chain + checkpoint</text></g>
+<g data-id="verdict" data-typ="usluga"><rect class="wz" x="784" y="116" width="168" height="72" rx="8"/>
+<text class="n" x="868" y="144" text-anchor="middle">Verdict</text>
+<text class="p" x="868" y="178" text-anchor="middle">intact or tampered</text></g>
+</svg>

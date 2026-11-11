@@ -1,5 +1,10 @@
 # Agent Audit Ledger
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="docs/how-it-works-dark.svg">
+  <img src="docs/how-it-works-light.svg" alt="Agent events are appended to a hash-chained SQLite ledger. Verification checks the chain for internal consistency and compares it with a checkpoint digest that an independent observer retained. The result says whether the history is intact or which kind of tampering was found." width="100%">
+</picture>
+
 Use it when you need a small local audit trail for an agent run and want to know two different things: **is the recorded chain internally consistent, and does it still contain the history an independent observer retained?**
 
 ## Quickstart
