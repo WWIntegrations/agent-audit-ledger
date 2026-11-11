@@ -23,6 +23,26 @@ HINTS = {
     'limit_exceeded': 'an input or ledger limit was exceeded (see README, Limits).',
     'input_io_error': 'the input file could not be read.',
     'output_io_error': 'the output could not be written.',
+    'storage_error': 'the database could not be opened or used. Check that --db names an existing ledger made by init.',
+    'semantic_error': 'the event does not fit the run: start it with run_started, record artifacts while it is active, '
+                      'finish it once, and do not reuse a run_id or artifact_id.',
+    'budget_exceeded': 'the operation ran past its time budget. Retry when the machine is less loaded.',
+    'input_changed': 'a file changed while it was being read. Retry once nothing else is writing it.',
+    'recovery_required': 'a rollback journal is next to the database. Run verify once so SQLite can roll it back.',
+    'unsupported_journal': 'the database uses WAL or has a stray journal file; this tool needs journal_mode=DELETE.',
+    'unsupported_runtime': 'Python 3.11+ with SQLite 3.31+ is required.',
+    'unsupported_schema': 'the file is not a ledger made by this tool (unexpected page size).',
+    'schema_mismatch': 'the file is not a ledger made by this tool, or its tables were changed.',
+    'sqlite_integrity': 'SQLite reports the file as corrupt or not a database.',
+    'record_invalid': 'a stored record is malformed; the ledger was edited outside this tool.',
+    'sequence_gap': 'a sequence number is missing; events were deleted or reordered.',
+    'hash_mismatch': 'a stored event does not match its hash; the ledger was edited.',
+    'head_mismatch': 'the stored head does not match the events; the ledger was edited or truncated.',
+    'truncated_before_anchor': 'the ledger has fewer events than the checkpoint; history was removed.',
+    'anchor_mismatch': 'the ledger does not match the checkpoint; it was rewritten or is a different ledger.',
+    'checkpoint_digest_mismatch': 'the checkpoint file does not match --expected-checkpoint-digest.',
+    'recorded_mismatch': 'the saved experiment does not match its manifest or the current source.',
+    'demo_control_failed': 'a demo self-check failed; please report it with the --json output.',
 }
 
 

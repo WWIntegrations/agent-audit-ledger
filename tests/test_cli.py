@@ -174,5 +174,27 @@ class LedgerCLI(unittest.TestCase):
         self.assertIn('2 event(s)', self.raw('verify', '--db', self.db).stdout)
 
 
+    def test_common_failures_say_what_to_do(self):
+        missing = self.raw('verify', '--db', self.base / 'typo.sqlite', code=2)
+        self.assertIn('storage_error', missing.stderr)
+        self.assertIn('init', missing.stderr)
+        self.assertNotIn('typo', missing.stderr)
+        self.assertFalse((self.base / 'typo.sqlite').exists())
+        self.call('init', '--db', self.db)
+        finish = self.event('finish', 'run_finished', {'run_id': 'run', 'outcome': 'success'})
+        early = self.raw('append', '--db', self.db, '--event', finish, code=1)
+        self.assertIn('semantic_error', early.stderr)
+        self.assertIn('run_started', early.stderr)
+
+    def test_every_error_code_has_a_hint(self):
+        import re
+        from ledger_audit.summary import HINTS
+        source = ''.join(p.read_text() for p in sorted((ROOT / 'ledger_audit').glob('*.py')))
+        codes = set(re.findall(r"(?:AuditError|IntegrityFailure)\('([a-z_]+)'", source))
+        codes |= {'truncated_before_anchor', 'anchor_mismatch', 'checkpoint_digest_mismatch'}
+        self.assertGreater(len(codes), 20)
+        self.assertEqual(sorted(codes - set(HINTS)), [])
+
+
 if __name__ == '__main__':
     unittest.main()
