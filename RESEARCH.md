@@ -1,6 +1,6 @@
 # Research and design decisions
 
-Primary sources reviewed on 2026-11-06. This repository is an independent portfolio project. It is not an integration with, or endorsement from, the organizations below.
+Primary sources reviewed on 2026-11-06. This repository is not an integration with, or endorsement from, the organizations below.
 
 ## Event history and replay
 
