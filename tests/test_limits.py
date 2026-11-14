@@ -1,6 +1,7 @@
 """Resource boundaries and injected SQLite failures around real transactions."""
 from contextlib import closing
 import json
+import os
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -97,6 +98,25 @@ class LimitTests(unittest.TestCase):
                     core.append(self.db, finish_input())
             self.assertEqual(core.verify(self.db)['snapshot_seq'], 1)
         self.assertEqual(core.append(self.db, finish_input())['disposition'], 'appended')
+
+    def test_schema_check_works_without_the_sqlite_schema_alias(self):
+        # README promises SQLite 3.31+; the sqlite_schema alias only exists from 3.33.
+        core.append(self.db, start_input())
+        real = sqlite3.connect
+        class Before333(sqlite3.Connection):
+            def execute(self, sql, params=()):
+                if 'sqlite_schema' in sql:
+                    raise sqlite3.OperationalError('no such table: sqlite_schema')
+                return super().execute(sql, params)
+        with patch.object(storage.sqlite3, 'connect', lambda *a, **kw: real(*a, **kw, factory=Before333)):
+            self.assertEqual(core.verify(self.db)['chain'], 'consistent')
+            self.assertEqual(core.append(self.db, finish_input())['disposition'], 'appended')
+
+    def test_symlinked_rollback_journal_is_unsafe_not_a_size_limit(self):
+        os.symlink(self.p/'elsewhere', str(self.db)+'-journal')
+        with self.assertRaises(f.AuditError) as cm:
+            core.verify(self.db)
+        self.assertEqual(cm.exception.code, 'unsafe_input')
 
     def test_unsupported_pragma_readback_is_a_failure(self):
         real = sqlite3.connect

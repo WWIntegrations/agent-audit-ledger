@@ -52,11 +52,21 @@ def _db_stat(path):
         journal = str(path) + '-journal'
         if os.path.lexists(journal):
             j = os.lstat(journal)
-            if not stat.S_ISREG(j.st_mode) or j.st_nlink != 1 or j.st_size > f.MAX_DB:
+            if not stat.S_ISREG(j.st_mode) or j.st_nlink != 1:
+                raise f.AuditError('unsafe_input')
+            if j.st_size > f.MAX_DB:
                 raise f.AuditError('limit_exceeded')
         return s
     except OSError as exc:
         raise f.AuditError('storage_error') from exc
+
+
+def _text(raw):
+    """Decode TEXT strictly. Invalid UTF-8 stays bytes, so the domain checks reject the edited value."""
+    try:
+        return raw.decode('utf-8')
+    except UnicodeDecodeError:
+        return raw
 
 
 def translate_sql(exc):
@@ -85,6 +95,7 @@ def database(path, *, initialize=False, readonly=False):
         c = sqlite3.connect(path.as_uri() + ('?mode=ro' if readonly else '?mode=rw'),
                             uri=True, isolation_level=None, timeout=2)
         c.row_factory = sqlite3.Row
+        c.text_factory = _text
         after = os.lstat(path)
         if (before.st_ino, before.st_dev) != (after.st_ino, after.st_dev):
             raise f.AuditError('input_changed')
@@ -129,7 +140,7 @@ def database(path, *, initialize=False, readonly=False):
 
 
 def check_schema(c, expected=LEDGER_SCHEMA):
-    rows = [tuple(r) for r in c.execute('SELECT type,name,tbl_name,sql FROM sqlite_schema').fetchmany(20)]
+    rows = [tuple(r) for r in c.execute('SELECT type,name,tbl_name,sql FROM sqlite_master').fetchmany(20)]
     if len(rows) != len(expected) or set(rows) != set(expected):
         raise f.IntegrityFailure('schema_mismatch')
     if [r[0] for r in c.execute('PRAGMA quick_check').fetchmany(2)] != ['ok']:

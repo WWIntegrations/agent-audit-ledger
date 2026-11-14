@@ -39,7 +39,7 @@ OK    chain consistent, 1 event(s), head 5faeb62031cb
 note  no checkpoint given: completeness is unknown (see --checkpoint)
 ```
 
-The head hashes differ on each run because every ledger gets a fresh ID. Add `--json` to any command for the full machine-readable result on stdout. Exit code 0 means success; verification failures exit 1; bad input or an existing output path exits 2. Without installing, `python3 -m ledger_audit demo` does the same from the repository root.
+The head hashes differ on each run because every ledger gets a fresh ID. Add `--json` to any command for the full machine-readable result on stdout. Exit code 0 means success. Exit code 1 means the ledger failed verification or refused the event (an `event_id` reused with different content, or an event that does not fit its run). Exit code 2 means bad arguments or input, a file that could not be read or written, or an existing output path. Without installing, `python3 -m ledger_audit demo` does the same from the repository root.
 
 **Your own data.** An event file is one JSON object: `event_id`, `type` (`run_started`, `artifact_recorded` or `run_finished`) and `payload`. Copy `examples/start.json` and `examples/finish.json`, edit them, append them the same way, then pin a checkpoint and replay:
 
@@ -48,7 +48,7 @@ ledger-audit checkpoint --db $D/l.sqlite --out $D/checkpoint.json
 ledger-audit replay --db $D/l.sqlite --out-db $D/projection.sqlite
 ```
 
-The checkpoint command prints the digest to retain separately; later `verify --checkpoint $D/checkpoint.json --expected-checkpoint-digest DIGEST` uses it. Repeating an identical event ID and input returns the original record. Reusing the ID for different content fails. An event after a run has finished fails.
+The checkpoint command prints `checkpoint digest DIGEST`: retain that value separately; later `verify --checkpoint $D/checkpoint.json --expected-checkpoint-digest DIGEST` uses it. Repeating an identical event ID and input returns the original record. Reusing the ID for different content fails. An event after a run has finished fails.
 
 ## Recorded experiment and viewer
 

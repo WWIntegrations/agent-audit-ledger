@@ -31,7 +31,7 @@ class ControlTests(unittest.TestCase):
             if row['path'] == name:
                 row['sha256'] = hashlib.sha256((root/name).read_bytes()).hexdigest()
         manifest_path.write_bytes(f.canonical(manifest)+b'\n')
-        # First failure remains hash_mismatch at2. Checking only its code misses this change.
+        # First failure remains hash_mismatch at seq 2. Checking only its code misses this change.
         with self.assertRaises(f.AuditError):
             validate_recorded(root)
 

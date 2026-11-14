@@ -106,11 +106,16 @@ def _render(r):
         return ['%s event %s as seq %d (%s)' % (r['disposition'], rec['event_id'], rec['seq'], rec['type'])]
     if fmt == 'audit-replay-v1':
         c = r['counts']
-        return ['replayed events 1..%d into SQL: %d run(s), %d active, %d finished, %d artifact(s)' % (
-            r['through_seq'], c['runs'], c['active_runs'], c['finished_runs'], c['artifacts'])]
+        span = 'events 1..%d' % r['through_seq'] if r['through_seq'] else '0 events'
+        return ['replayed %s into SQL: %d run(s), %d active, %d finished, %d artifact(s)' % (
+            span, c['runs'], c['active_runs'], c['finished_runs'], c['artifacts'])]
     if fmt == 'audit-file-result-v1':
         line = '%s done: %d events, head %s' % (r['operation'], r['count'], _short(r['head_hash']))
         if r['artifact_digest']:
-            line += ', artifact digest %s' % r['artifact_digest']
+            label = 'checkpoint' if r['operation'] == 'checkpoint' else 'export'
+            line += ', %s digest %s' % (label, r['artifact_digest'])
+        if r['operation'] == 'checkpoint':
+            return [line, 'note  retain this digest apart from the files; later run verify with '
+                          '--checkpoint FILE --expected-checkpoint-digest DIGEST']
         return [line]
     return [str(r)]
