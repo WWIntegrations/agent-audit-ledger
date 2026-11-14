@@ -194,6 +194,22 @@ class LedgerCLI(unittest.TestCase):
         self.assertEqual(r['failure']['code'], 'record_invalid')
         self.assertIn('FAIL  chain is not usable: record_invalid', self.raw('verify', '--db', self.db, code=1).stdout)
 
+    def test_checkpoint_summary_names_the_digest_to_retain(self):
+        self.start()
+        cp = self.base / 'cp.json'
+        out = self.raw('checkpoint', '--db', self.db, '--out', cp).stdout
+        from ledger_audit import formats
+        digest = formats.digest('audit-checkpoint-v1', json.loads(cp.read_text()))
+        self.assertIn('checkpoint digest ' + digest, out)
+        self.assertIn('--expected-checkpoint-digest', out)
+        self.raw('verify', '--db', self.db, '--checkpoint', cp, '--expected-checkpoint-digest', digest)
+
+    def test_replay_of_zero_events_does_not_print_an_empty_range(self):
+        self.start()
+        out = self.raw('replay', '--db', self.db, '--through-seq', '0', '--out-db', self.base / 'zero.sqlite').stdout
+        self.assertNotIn('1..0', out)
+        self.assertIn('replayed 0 events into SQL', out)
+
     def test_every_error_code_has_a_hint(self):
         import re
         from ledger_audit.summary import HINTS
