@@ -22,9 +22,13 @@ The source HTML checked in the browser and used for the recording has SHA256:
 
 `b78a6bfd3ab2410b12bad977d39975a9123a00c5e36ed418aff67319b370a03a`
 
-The recording contains actual browser interactions at 1440x900, 25 fps, 543 frames, 21.72 seconds. Asset hashes are in [media-manifest.json](media-manifest.json). The browser selects recorded evidence; it does not perform fresh SQLite operations. The diagram and custom404 were separately checked in a browser on desktop and mobile.
+Later source changes re-recorded `examples/recorded` and rebuilt `docs/index.html` from it, because the manifest binds the current Python sources. The viewer template, script, styles and fonts are unchanged since the recording, so the current file differs from that hash only in the embedded experiment: ledger ID, timestamps and hashes.
 
-The experiment contains four events and two measured files totalling104 bytes. The retained checkpoint identifies the four-event prefix; the shorter replay uses three events. Unsigned manifests and checkpoints establish internal consistency under the stated trust boundary, not identity, trusted time or event truth. Full visual equivalence with the design reference is not established; the artwork and interactions are original, and Anton/system fonts replace licensed reference fonts.
+The recording contains actual browser interactions at 1440x900, 25 fps, 543 frames, 21.72 seconds. Asset hashes are in [media-manifest.json](media-manifest.json). The browser selects recorded evidence; it does not perform fresh SQLite operations. The diagram and custom 404 page were separately checked in a browser on desktop and mobile.
+
+The experiment contains four events and two measured files totalling 104 bytes. The retained checkpoint identifies the four-event prefix; the shorter replay uses three events. Unsigned manifests and checkpoints establish internal consistency under the stated trust boundary, not identity, trusted time or event truth. Full visual equivalence with the design reference is not established; the artwork and interactions are original, and Anton/system fonts replace licensed reference fonts.
+
+Re-run on 2026-11-14 after fixing invalid UTF-8 handling and the SQLite 3.31 schema query: 50 Python tests and 17 interface tests passed, the demo passed, and two `--from-recorded` builds were identical. Browser checks were not repeated.
 
 To repeat core and interface checks:
 
