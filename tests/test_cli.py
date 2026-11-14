@@ -186,6 +186,14 @@ class LedgerCLI(unittest.TestCase):
         self.assertIn('semantic_error', early.stderr)
         self.assertIn('run_started', early.stderr)
 
+    def test_edited_ledger_with_invalid_utf8_exits_1(self):
+        self.start()
+        with closing(sqlite3.connect(self.db)) as c, c:
+            c.execute("UPDATE events SET record_json=CAST(x'7bff7d' AS TEXT)")
+        r = self.call('verify', '--db', self.db, code=1)
+        self.assertEqual(r['failure']['code'], 'record_invalid')
+        self.assertIn('FAIL  chain is not usable: record_invalid', self.raw('verify', '--db', self.db, code=1).stdout)
+
     def test_every_error_code_has_a_hint(self):
         import re
         from ledger_audit.summary import HINTS

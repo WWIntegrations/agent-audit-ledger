@@ -1,1 +1,1 @@
-{"format":"audit-checkpoint-v1","head_hash":"1091f47d579332e96c5cef71652cbb3730fa63442f337f5446d52a5bd7bb2f60","header":{"event_version":"event-v1","format":"audit-header-v1","ledger_id":"e375c7aa1ae549c99e178e347192fa18","reducer_version":"projection-v1"},"seq":4}
+{"format":"audit-checkpoint-v1","head_hash":"df940a317c83726d069f5630f54a6cd667307b039bb771ce4ed9daa71f34b43c","header":{"event_version":"event-v1","format":"audit-header-v1","ledger_id":"7a98bec6bb8a48a981b4550dfdd94c9f","reducer_version":"projection-v1"},"seq":4}

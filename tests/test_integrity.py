@@ -192,6 +192,21 @@ class IntegrityTests(unittest.TestCase):
         with self.assertRaises(f.AuditError):
             f.event_input({**start_input(), 'extra': None})
 
+    def test_invalid_utf8_in_stored_text_is_a_verification_failure(self):
+        # An edited ledger must fail verification (exit 1), not look like a usage error.
+        core.append(self.db, start_input())
+        pristine = self.db.read_bytes()
+        with closing(sqlite3.connect(self.db)) as c, c:
+            c.execute("UPDATE events SET record_json=CAST(x'7bff7d' AS TEXT) WHERE seq=1")
+        r = core.verify(self.db)
+        self.assertEqual((r['chain'], r['failure']), ('invalid', {'code': 'record_invalid', 'seq': 1}))
+        with self.assertRaises(f.IntegrityFailure):
+            core.append(self.db, finish_input())
+        self.db.write_bytes(pristine)
+        with closing(sqlite3.connect(self.db)) as c, c:
+            c.execute("UPDATE meta SET header_json=CAST(x'7bc0af7d' AS TEXT)")
+        self.assertEqual(core.verify(self.db)['failure']['code'], 'record_invalid')
+
     def test_invalid_calendar_timestamp(self):
         core.append(self.db, start_input())
         self.replace_record(1, lambda r: r.update(recorded_at='2026-02-30T10:00:00.000000Z'))
